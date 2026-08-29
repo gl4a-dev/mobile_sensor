@@ -76,8 +76,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
 						SizedBox(
 							width: double.infinity,
 							child: ElevatedButton(
-								onPressed:
-										loading ? null : _performMeasurement,
+								onPressed: loading ? null : _performMeasurement,
 								child: Text(
 									loading ? 'Taking...' : 'Take measurement',
 								),
