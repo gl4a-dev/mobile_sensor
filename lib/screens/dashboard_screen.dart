@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'measurement_screen.dart';
 import 'history_screen.dart';
+import 'settings_screen.dart';
 
 
 class DashboardScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 	int _currentIndex = 0;
 
 	final GlobalKey<HistoryScreenState> _historyKey = GlobalKey<HistoryScreenState>();
+	final GlobalKey<SettingsScreenState> _settingsKey = GlobalKey<SettingsScreenState>();
 
 	void _onTabTapped(int index) {
 		setState(() {
@@ -23,6 +25,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 		if (index == 1) {
 			_historyKey.currentState?.loadHistory();
+		} else if (index == 2) {
+			_settingsKey.currentState?.loadSettings();
 		}
 	}
 
@@ -34,6 +38,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 				children: [
 					const MeasurementScreen(),
 					HistoryScreen(key: _historyKey),
+					SettingsScreen(key: _settingsKey),
 				],
 			),
 			bottomNavigationBar: BottomNavigationBar(
@@ -52,6 +57,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 					BottomNavigationBarItem(
 						icon: Icon(Icons.data_object),
 						label: 'Logs []',
+					),
+					BottomNavigationBarItem(
+						icon: Icon(Icons.settings),
+						label: 'Config {}',
 					),
 				],
 			),
