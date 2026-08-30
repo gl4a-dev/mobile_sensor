@@ -24,11 +24,42 @@ class InternetQuality {
 		this.error,
 	});
 
+	Map<String, dynamic> toMap() {
+		return {
+			'ping': ping,
+			'jitter': jitter,
+			'ping_success_rate': pingSuccessRate,
+			'download_mbps': download,
+			'upload_mbps': upload,
+			'started_at': startedAt.toIso8601String(),
+			'duration_ms': duration.inMilliseconds,
+			'endpoint': endpoint,
+			'success': success,
+			'error': error,
+		};
+	}
+
+	factory InternetQuality.fromMap(Map<String, dynamic> map) {
+		return InternetQuality(
+			ping: (map['ping'] as num?)?.toDouble(),
+			jitter: (map['jitter'] as num?)?.toDouble(),
+			pingSuccessRate: (map['ping_success_rate'] as num?)?.toDouble(),
+			download: (map['download_mbps'] as num?)?.toDouble(),
+			upload: (map['upload_mbps'] as num?)?.toDouble(),
+			startedAt: DateTime.parse(map['started_at'] as String),
+			duration: Duration(milliseconds: map['duration_ms'] as int),
+			endpoint: map['endpoint'] as String,
+			success: map['success'] as bool,
+			error: map['error'] as String?,
+		);
+	}
+
 	@override
 	String toString() {
 		final successPct = pingSuccessRate != null ? '${(pingSuccessRate! * 100).toStringAsFixed(0)}%' : '-';
 
-		return '''
+		return 
+'''
 ----- INTERNET QUALITY -----
 Ping: ${ping?.toStringAsFixed(2)} ms
 Jitter: ${jitter?.toStringAsFixed(2)} ms
