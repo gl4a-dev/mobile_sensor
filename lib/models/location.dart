@@ -15,11 +15,11 @@ class Location {
 
 	Map<String, dynamic> toMap() {
 		return {
-		'latitude': latitude,
-		'longitude': longitude,
-		'accuracy': accuracy,
-		'altitude': altitude,
-		'provider': provider,
+			'latitude': latitude,
+			'longitude': longitude,
+			'accuracy': accuracy,
+			'altitude': altitude,
+			'provider': provider,
 		};
 	}
 

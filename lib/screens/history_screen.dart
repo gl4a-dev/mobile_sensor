@@ -51,7 +51,7 @@ class HistoryScreenState extends State<HistoryScreen> {
 			actions: [
 				IconButton(
 					icon: Icon(_showRawVector ? Icons.list : Icons.code),
-					tooltip: 'Alternar View RAW/Lista',
+					tooltip: 'Toggle View RAW/List',
 					onPressed: () => setState(() => _showRawVector = !_showRawVector),
 				),
 				IconButton(
@@ -66,7 +66,7 @@ class HistoryScreenState extends State<HistoryScreen> {
 			: _jsonVector.isEmpty
 				? const Center(
 					child: Text(
-						'// Nenhuma medição registrada.',
+						'// None measurement recorded.',
 						style: TextStyle(fontFamily: 'monospace', color: Color(0xFF8B949E)),
 					),
 				)
@@ -90,15 +90,15 @@ class HistoryScreenState extends State<HistoryScreen> {
 					border: Border.all(color: const Color(0xFF30363D)),
 				),
 				child: SingleChildScrollView(
-				physics: const AlwaysScrollableScrollPhysics(),
-				child: SelectableText(
-					rawText,
-					style: const TextStyle(
-						fontFamily: 'monospace',
-						fontSize: 11,
-						color: Color(0xFF79C0FF),
+					physics: const AlwaysScrollableScrollPhysics(),
+					child: SelectableText(
+						rawText,
+						style: const TextStyle(
+							fontFamily: 'monospace',
+							fontSize: 11,
+							color: Color(0xFF79C0FF),
+						),
 					),
-				),
 				),
 			),
 		);
@@ -123,14 +123,14 @@ class HistoryScreenState extends State<HistoryScreen> {
 						borderRadius: BorderRadius.circular(6),
 					),
 					child: ExpansionTile(
-						title: Text(
-						'ID: $id',
-						style: const TextStyle(
-							fontFamily: 'monospace',
-							fontSize: 13,
-							fontWeight: FontWeight.bold,
-							color: Color(0xFF58A6FF),
-						),
+							title: Text(
+							'ID: $id',
+							style: const TextStyle(
+								fontFamily: 'monospace',
+								fontSize: 13,
+								fontWeight: FontWeight.bold,
+								color: Color(0xFF58A6FF),
+							),
 						),
 						subtitle: Text(
 							'$timestamp | Wi-Fi: $wifiCount',

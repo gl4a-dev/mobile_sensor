@@ -6,6 +6,7 @@ import 'network_status.dart';
 import 'wifi_list.dart';
 import 'noise.dart';
 
+
 class Measurement {
 	final String id;
 	final DateTime timestamp;
@@ -42,23 +43,23 @@ class Measurement {
 
 	factory Measurement.fromMap(Map<String, dynamic> map) {
 		return Measurement(
-		id: map['id'] as String,
-		timestamp: DateTime.parse(map['timestamp'] as String),
-		location: map['location'] != null
-			? Location.fromMap(map['location'] as Map<String, dynamic>)
-			: null,
-		internetQuality: map['internet_quality'] != null
-			? InternetQuality.fromMap(map['internet_quality'] as Map<String, dynamic>)
-			: null,
-		networkStatus: map['network_status'] != null
-			? NetworkStatus.fromMap(map['network_status'] as Map<String, dynamic>)
-			: null,
-		wifiList: map['wifi_list'] != null
-			? WifiList.fromMapList(map['wifi_list'] as List<dynamic>)
-			: null,
-		noiseMeasurement: map['noise_measurement'] != null
-			? NoiseMeasurement.fromMap(map['noise_measurement'] as Map<String, dynamic>)
-			: null,
+			id: map['id'] as String,
+			timestamp: DateTime.parse(map['timestamp'] as String),
+			location: map['location'] != null
+				? Location.fromMap(map['location'] as Map<String, dynamic>)
+				: null,
+			internetQuality: map['internet_quality'] != null
+				? InternetQuality.fromMap(map['internet_quality'] as Map<String, dynamic>)
+				: null,
+			networkStatus: map['network_status'] != null
+				? NetworkStatus.fromMap(map['network_status'] as Map<String, dynamic>)
+				: null,
+			wifiList: map['wifi_list'] != null
+				? WifiList.fromMapList(map['wifi_list'] as List<dynamic>)
+				: null,
+			noiseMeasurement: map['noise_measurement'] != null
+				? NoiseMeasurement.fromMap(map['noise_measurement'] as Map<String, dynamic>)
+				: null,
 		);
 	}
 

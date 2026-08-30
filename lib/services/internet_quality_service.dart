@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+
 import '../models/internet_quality.dart';
+
 
 class PingResult {
 	final double averagePingMs;
@@ -32,15 +34,9 @@ class InternetQualityService {
 		bool isSuccess = false;
 
 		try {
-			// 1. (5 Pings)
-			pingMetrics = await _measurePingAndJitter();
-
-			// 2. (~1.5 MB)
-			downloadMbps = await _measureDownload();
-
-			// 3. (~384 KB)
-			uploadMbps = await _measureUpload();
-
+			pingMetrics = await _measurePingAndJitter(); // 5 Pings
+			downloadMbps = await _measureDownload(); // ~1.5 MB
+			uploadMbps = await _measureUpload(); // ~384 KB
 			isSuccess = true;
 		} catch (e) {
 			errorMessage = e.toString();

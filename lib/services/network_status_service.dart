@@ -5,6 +5,7 @@ import 'package:network_info_plus/network_info_plus.dart';
 
 import '../models/network_status.dart';
 
+
 class NetworkStatusService {
 	final Connectivity _connectivity = Connectivity();
 	final NetworkInfo _networkInfo = NetworkInfo();

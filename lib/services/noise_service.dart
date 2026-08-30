@@ -3,6 +3,7 @@ import 'package:record/record.dart';
 
 import '../models/noise.dart';
 
+
 class NoiseService {
 	final AudioRecorder _recorder = AudioRecorder();
 

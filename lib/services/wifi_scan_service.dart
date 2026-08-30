@@ -1,6 +1,8 @@
 import 'package:wifi_scan/wifi_scan.dart';
+
 import '../models/wifi_network.dart';
 import '../models/wifi_list.dart';
+
 
 class WifiScanService {
 	Future<WifiList> scanNetworks() async {

@@ -2,13 +2,14 @@ import 'package:geolocator/geolocator.dart';
 
 import '../models/location.dart';
 
+
 class LocationService {
 	Future<Location> getCurrentLocation() async {
 		final serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
 		if (!serviceEnabled) {
 			throw Exception(
-				'O serviço de localização está desativado.',
+				'Location services are disabled.',
 			);
 		}
 
@@ -20,13 +21,13 @@ class LocationService {
 
 		if (permission == LocationPermission.denied) {
 			throw Exception(
-				'A permissão de localização foi negada.',
+				'Location permission was denied.',
 			);
 		}
 
 		if (permission == LocationPermission.deniedForever) {
 			throw Exception(
-				'A permissão de localização foi negada permanentemente.',
+				'Location permission has been permanently denied.',
 			);
 		}
 

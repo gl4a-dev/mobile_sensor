@@ -1,10 +1,10 @@
 import '../models/measurement.dart';
-
 import 'internet_quality_service.dart';
 import 'location_service.dart';
 import 'network_status_service.dart';
 import 'noise_service.dart';
 import 'wifi_scan_service.dart';
+
 
 class MeasurementService {
 	final LocationService locationService;
@@ -29,14 +29,14 @@ class MeasurementService {
 		final internetQuality = await internetQualityService.measureInternetQuality();
 
 		final measurement = Measurement(
-		id: DateTime.now().microsecondsSinceEpoch.toString(),
-		timestamp: DateTime.now(),
+			id: DateTime.now().microsecondsSinceEpoch.toString(),
+			timestamp: DateTime.now(),
 
-		location: location,
-		noiseMeasurement: noiseMeasurement,
-		internetQuality: internetQuality,
-		networkStatus: networkStatus,
-		wifiList: wifiNetworks,
+			location: location,
+			noiseMeasurement: noiseMeasurement,
+			internetQuality: internetQuality,
+			networkStatus: networkStatus,
+			wifiList: wifiNetworks,
 		);
 
 		return measurement;

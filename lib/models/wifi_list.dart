@@ -1,5 +1,6 @@
 import 'wifi_network.dart';
 
+
 class WifiList {
 	final List<WifiNetwork> networks;
 
