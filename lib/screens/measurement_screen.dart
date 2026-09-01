@@ -132,7 +132,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
 				children: [
 					_buildStat('PING', '${m.internetQuality?.ping?.toStringAsFixed(0) ?? "-"} ms'),
 					_buildStat('DOWN', '${m.internetQuality?.download?.toStringAsFixed(1) ?? "-"} Mbps'),
-					_buildStat('NOISE', '${m.noiseMeasurement?.db.toStringAsFixed(1) ?? "-"} dB'),
+					_buildStat('UP', '${m.internetQuality?.upload?.toStringAsFixed(1) ?? "-"} Mbps'),
 					_buildStat('WIFI NETS', '${m.wifiList?.networks.length ?? 0}'),
 				],
 			),
