@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import 'core/settings/user_preferences_storage.dart';
 import 'screens/dashboard_screen.dart';
+import 'workers/background_scheduler_worker.dart';
 
+void main() async {
+	WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
+	await [
+		Permission.notification,
+		Permission.location,
+		Permission.locationAlways,
+	].request();
+
+	await BackgroundSchedulerWorker.initializeService();
+
+	final settings = await UserPreferencesStorage().getSettings();
+	await BackgroundSchedulerWorker.syncServiceState(settings);
+
 	runApp(const MobileSensorApp());
 }
 

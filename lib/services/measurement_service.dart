@@ -24,7 +24,7 @@ class MeasurementService {
 	Future<Measurement> createMeasurement() async {
 		final location = await locationService.getCurrentLocation();
 		final wifiNetworks = await wifiScanService.scanNetworks();
-		final noiseMeasurement = await noiseService.measureNoise();
+		// final noiseMeasurement = await noiseService.measureNoise();
 		final networkStatus = await networkStatusService.getCurrentNetworkStatus();
 		final internetQuality = await internetQualityService.measureInternetQuality();
 
@@ -33,7 +33,7 @@ class MeasurementService {
 			timestamp: DateTime.now(),
 
 			location: location,
-			noiseMeasurement: noiseMeasurement,
+			noiseMeasurement: null,
 			internetQuality: internetQuality,
 			networkStatus: networkStatus,
 			wifiList: wifiNetworks,

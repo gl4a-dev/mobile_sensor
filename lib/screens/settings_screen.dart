@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/settings/user_preferences_storage.dart';
 import '../core/settings/app_settings.dart';
-
+import '../workers/background_scheduler_worker.dart';
 
 class SettingsScreen extends StatefulWidget {
 	const SettingsScreen({super.key});
@@ -38,6 +38,7 @@ class SettingsScreenState extends State<SettingsScreen> {
 	Future<void> _updateSettings(AppSettings newSettings) async {
 		setState(() => _settings = newSettings);
 		await _storage.saveSettings(newSettings);
+		await BackgroundSchedulerWorker.syncServiceState(newSettings);
 	}
 
 	double get _activeHoursPerDay {
