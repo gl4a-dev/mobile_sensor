@@ -1,10 +1,10 @@
 class NoiseMeasurement {
-	final double rms;
-	final double db;
+	final double? rms;
+	final double? db;
 
 	const NoiseMeasurement({
-		required this.rms,
-		required this.db,
+		this.rms,
+		this.db,
 	});
 
 	Map<String, dynamic> toMap() {
@@ -16,18 +16,20 @@ class NoiseMeasurement {
 
 	factory NoiseMeasurement.fromMap(Map<String, dynamic> map) {
 		return NoiseMeasurement(
-			rms: (map['rms'] as num).toDouble(),
-			db: (map['db'] as num).toDouble(),
+			rms: (map['rms'] as num?)?.toDouble(),
+			db: (map['db'] as num?)?.toDouble(),
 		);
 	}
 
 	@override
 	String toString() {
-		return 
-'''
+		final rmsStr = rms != null ? rms!.toStringAsFixed(2) : '-';
+		final dbStr = db != null ? db!.toStringAsFixed(2) : '-';
+
+		return '''
 ----- NOISE -----
-RMS: ${rms.toStringAsFixed(2)}
-dB: ${db.toStringAsFixed(2)}
-''';
+RMS: $rmsStr
+dB: $dbStr
+	''';
 	}
 }
