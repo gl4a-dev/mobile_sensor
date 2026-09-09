@@ -107,5 +107,8 @@ app.*.map.json
 # Secrets & Environment variables
 *.env
 
+# Firebase / Android configuration
+android/app/google-services.json
+
 # Widget Preview
 .widget_preview/
