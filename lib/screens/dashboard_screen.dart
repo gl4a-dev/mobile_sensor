@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../data/auth/auth_service.dart';
 import 'measurement_screen.dart';
 import 'history_screen.dart';
 import 'settings_screen.dart';
@@ -17,6 +18,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 	final GlobalKey<HistoryScreenState> _historyKey = GlobalKey<HistoryScreenState>();
 	final GlobalKey<SettingsScreenState> _settingsKey = GlobalKey<SettingsScreenState>();
+	final AuthService _authService = AuthService();
 
 	void _onTabTapped(int index) {
 		setState(() {
@@ -33,6 +35,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
 	@override
 	Widget build(BuildContext context) {
 		return Scaffold(
+			appBar: AppBar(
+				title: const Text(
+					'Mobile Sensor',
+					style: TextStyle(fontFamily: 'monospace', fontSize: 18),
+				),
+				backgroundColor: const Color(0xFF161B22),
+				foregroundColor: Colors.white,
+				elevation: 0,
+				actions: [
+					IconButton(
+						icon: const Icon(Icons.logout, color: Color(0xFFF85149)),
+						tooltip: 'Logout',
+						onPressed: () async {
+							await _authService.signOut();
+						},
+					),
+				],
+			),
 			body: IndexedStack(
 				index: _currentIndex,
 				children: [
