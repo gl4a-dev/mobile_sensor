@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'core/settings/user_preferences_storage.dart';
 import 'screens/dashboard_screen.dart';
+import 'screens/login_screen.dart';
 import 'workers/background_scheduler_worker.dart';
+import 'data/auth/auth_service.dart';
+
 
 void main() async {
 	WidgetsFlutterBinding.ensureInitialized();
+
+	await dotenv.load(fileName: ".env");
+	await Firebase.initializeApp();
 
 	await [
 		Permission.notification,
@@ -27,6 +36,8 @@ class MobileSensorApp extends StatelessWidget {
 
 	@override
 	Widget build(BuildContext context) {
+		final authService = AuthService();
+
 		return MaterialApp(
 			debugShowCheckedModeBanner: false,
 			title: 'Sensor Dev Suite',
@@ -62,7 +73,22 @@ class MobileSensorApp extends StatelessWidget {
 					),
 				),
 			),
-			home: const DashboardScreen(),
+			home: StreamBuilder<User?>(
+				stream: authService.authStateChanges,
+				builder: (context, snapshot) {
+					if (snapshot.connectionState == ConnectionState.waiting) {
+						return const Scaffold(
+							body: Center(child: CircularProgressIndicator()),
+						);
+					}
+
+					if (snapshot.hasData) {
+						return const DashboardScreen();
+					}
+
+					return const LoginScreen();
+				},
+			),
 		);
 	}
 }
