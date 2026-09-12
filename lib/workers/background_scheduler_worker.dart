@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../core/settings/app_settings.dart';
 import '../core/settings/user_preferences.dart';
+import '../data/auth/auth_service.dart';
 import '../data/local_measurement_storage.dart';
 import '../services/internet_quality_service.dart';
 import '../services/location_service.dart';
@@ -20,8 +23,18 @@ void onStart(ServiceInstance service) async {
 	DartPluginRegistrant.ensureInitialized();
 	WidgetsFlutterBinding.ensureInitialized();
 
+	// 1. Inicializa o ambiente e o Firebase para o isolate de segundo plano
+	try {
+		await dotenv.load(fileName: ".env");
+	} catch (_) {}
+
+	try {
+		await Firebase.initializeApp();
+	} catch (_) {}
+
 	final preferences = UserPreferences();
 	final localStorage = LocalMeasurementStorage();
+	final authService = AuthService();
 
 	final measurementService = MeasurementService(
 		locationService: LocationService(),
@@ -40,13 +53,11 @@ void onStart(ServiceInstance service) async {
 
 	service.on('updateSettings').listen((event) async {
 		timer?.cancel();
-		timer = await _scheduleNextRun(service, preferences, localStorage, measurementService);
+		timer = await _scheduleNextRun(service, preferences, localStorage, measurementService, authService);
 	});
 
-	// Executes an initial measurement cycle when starting the service
-	await _runMeasurementCycle(service, preferences, localStorage, measurementService);
-
-	timer = await _scheduleNextRun(service, preferences, localStorage, measurementService);
+	timer = await _scheduleNextRun(service, preferences, localStorage, measurementService, authService);
+	await _runMeasurementCycle(service, preferences, localStorage, measurementService, authService);
 }
 
 Future<Timer> _scheduleNextRun(
@@ -54,6 +65,7 @@ Future<Timer> _scheduleNextRun(
 	UserPreferences preferences,
 	LocalMeasurementStorage localStorage,
 	MeasurementService measurementService,
+	AuthService authService,
 ) async {
 	final settings = await preferences.getSettings();
 	final interval = Duration(
@@ -61,7 +73,7 @@ Future<Timer> _scheduleNextRun(
 	);
 
 	return Timer.periodic(interval, (timer) async {
-		await _runMeasurementCycle(service, preferences, localStorage, measurementService);
+		await _runMeasurementCycle(service, preferences, localStorage, measurementService, authService);
 	});
 }
 
@@ -70,53 +82,55 @@ Future<void> _runMeasurementCycle(
 	UserPreferences preferences,
 	LocalMeasurementStorage localStorage,
 	MeasurementService measurementService,
+	AuthService authService,
 ) async {
-	final currentSettings = await preferences.getSettings();
-
-	if (!currentSettings.isBackgroundServiceEnabled) {
-		service.stopSelf();
-		return;
-	}
-
-	final now = DateTime.now();
-
-	// 1. Active Days Check
-	if (!currentSettings.activeDays.contains(now.weekday)) {
-		_updateNotification(
-			service, 'Outside active day (${_getWeekdayName(now.weekday)}).');
-		return;
-	}
-
-	// 2. Time Window Check
-	if (!currentSettings.isIntermittent24h) {
-		final startMinutes = currentSettings.startTime.hour * 60 + currentSettings.startTime.minute;
-		final endMinutes = currentSettings.endTime.hour * 60 + currentSettings.endTime.minute;
-		final currentMinutes = now.hour * 60 + now.minute;
-
-		bool isInWindow = false;
-		if (endMinutes >= startMinutes) {
-			isInWindow = currentMinutes >= startMinutes && currentMinutes <= endMinutes;
-		} else {
-			isInWindow = currentMinutes >= startMinutes || currentMinutes <= endMinutes;
-		}
-
-		if (!isInWindow) {
-			_updateNotification(service, 'Outside configured time window.');
-			return;
-		}
-	}
-
-	// 3. Wi-Fi Check
-	if (currentSettings.speedTestOnlyOnWifi) {
-		final netStatus = await NetworkStatusService().getCurrentNetworkStatus();
-		if (netStatus.connectionType != 'wifi') {
-			_updateNotification(service, 'Skipped: Connected to mobile data (Wi-Fi only mode).');
-			return;
-		}
-	}
-
-	// 4. Executing sensor measurements
 	try {
+		final currentSettings = await preferences.getSettings();
+
+		if (!currentSettings.isBackgroundServiceEnabled) {
+			service.stopSelf();
+			return;
+		}
+
+		final now = DateTime.now();
+
+		// 1. Active Days Check
+		if (!currentSettings.activeDays.contains(now.weekday)) {
+			_updateNotification(
+				service, 'Outside active day (${_getWeekdayName(now.weekday)}).');
+			return;
+		}
+
+		// 2. Time Window Check
+		if (!currentSettings.isIntermittent24h) {
+			final startMinutes = currentSettings.startTime.hour * 60 + currentSettings.startTime.minute;
+			final endMinutes = currentSettings.endTime.hour * 60 + currentSettings.endTime.minute;
+			final currentMinutes = now.hour * 60 + now.minute;
+
+			bool isInWindow = false;
+			if (endMinutes >= startMinutes) {
+				isInWindow = currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+			} else {
+				isInWindow = currentMinutes >= startMinutes || currentMinutes <= endMinutes;
+			}
+
+			if (!isInWindow) {
+				_updateNotification(service, 'Outside configured time window.');
+				return;
+			}
+		}
+
+		// 3. Wi-Fi Check
+		if (currentSettings.speedTestOnlyOnWifi) {
+			final netStatus = await NetworkStatusService().getCurrentNetworkStatus();
+			if (netStatus.connectionType != 'wifi') {
+				_updateNotification(
+					service, 'Skipped: Connected to mobile data (Wi-Fi only mode).');
+				return;
+			}
+		}
+
+		// 4. Executing sensor measurements
 		_updateNotification(service, 'Collecting sensor data...');
 
 		final measurement = await measurementService.createMeasurement();
@@ -128,8 +142,37 @@ Future<void> _runMeasurementCycle(
 			service,
 			'Last collection: $hour:$min | Wi-Fi networks: ${measurement.wifiList?.networks.length ?? 0}',
 		);
+
+		// 5. Automatic Batch Sync Verification
+		await _checkAndSyncBatch(service, currentSettings, localStorage, authService);
+
 	} catch (e) {
 		_updateNotification(service, 'Collection error: ${e.toString()}');
+	}
+}
+
+Future<void> _checkAndSyncBatch(
+	ServiceInstance service,
+	AppSettings settings,
+	LocalMeasurementStorage localStorage,
+	AuthService authService,
+) async {
+	try {
+		final unsyncedMeasurements =
+			await localStorage.getUnsyncedMeasurementsRaw();
+		final minBatchSize = settings.minBatchSize;
+
+		if (unsyncedMeasurements.length >= minBatchSize) {
+			final success =
+				await authService.sendBatchMeasurements(unsyncedMeasurements);
+			if (success) {
+				final syncedIds =
+					unsyncedMeasurements.map((e) => e['id'] as String).toList();
+				await localStorage.markAsSynced(syncedIds);
+			}
+		}
+	} catch (_) {
+		// pass
 	}
 }
 
@@ -191,11 +234,11 @@ class BackgroundSchedulerWorker {
 		final isRunning = await service.isRunning();
 
 		if (settings.isBackgroundServiceEnabled) {
-		if (!isRunning) {
-			await service.startService();
-		} else {
-			service.invoke('updateSettings');
-		}
+			if (!isRunning) {
+				await service.startService();
+			} else {
+				service.invoke('updateSettings');
+			}
 		} else {
 			if (isRunning) {
 				service.invoke('stopService');
