@@ -71,25 +71,25 @@ class HistoryScreenState extends State<HistoryScreen> {
 				await _storage.markAsSynced(syncedIds);
 
 				if (mounted) {
-				ScaffoldMessenger.of(context).showSnackBar(
-					SnackBar(
-					content: Text('${syncedIds.length} registro(s) sincronizado(s) com sucesso!'),
-					backgroundColor: const Color(0xFF238636),
-					),
-				);
+					ScaffoldMessenger.of(context).showSnackBar(
+						SnackBar(
+							content: Text('${syncedIds.length} record(s) successfully synced!'),
+							backgroundColor: const Color(0xFF238636),
+						),
+					);
 				}
 
 				await loadHistory();
 			} else {
-				throw Exception('O servidor retornou um erro ao processar o lote.');
+				throw Exception('The server returned an error when processing the batch.');
 			}
 		} catch (e) {
 			if (mounted) {
 				ScaffoldMessenger.of(context).showSnackBar(
-				SnackBar(
-					content: Text('Falha na sincronização: ${e.toString()}'),
-					backgroundColor: const Color(0xFFDA3633),
-				),
+					SnackBar(
+						content: Text('Sync failed: ${e.toString()}'),
+						backgroundColor: const Color(0xFFDA3633),
+					),
 				);
 			}
 		} finally {
