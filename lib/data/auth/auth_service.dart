@@ -75,4 +75,25 @@ class AuthService {
 		await GoogleSignIn.instance.signOut();
 		await _auth.signOut();
 	}
+
+	Future<bool> sendBatchMeasurements(List<Map<String, dynamic>> payloadList) async {
+		final user = _auth.currentUser;
+		if (user == null) {
+			throw Exception('User not authenticated.');
+		}
+
+		final idToken = await user.getIdToken();
+		final backendUrl = dotenv.env['BACKEND_URL'] ?? 'https://your-backend.onrender.com';
+
+		final response = await http.post(
+			Uri.parse('$backendUrl/api/v1/measurements/batch'),
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': 'Bearer $idToken',
+			},
+			body: jsonEncode({'measurements': payloadList}),
+		);
+
+		return response.statusCode == 200 || response.statusCode == 201;
+  	}
 }
