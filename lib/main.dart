@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'core/settings/user_preferences_storage.dart';
+import 'core/settings/user_preferences.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/login_screen.dart';
 import 'workers/background_scheduler_worker.dart';
@@ -25,7 +25,7 @@ void main() async {
 
 	await BackgroundSchedulerWorker.initializeService();
 
-	final settings = await UserPreferencesStorage().getSettings();
+	final settings = await UserPreferences().getSettings();
 	await BackgroundSchedulerWorker.syncServiceState(settings);
 
 	runApp(const MobileSensorApp());

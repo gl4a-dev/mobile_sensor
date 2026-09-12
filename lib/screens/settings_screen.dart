@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../core/settings/user_preferences_storage.dart';
+import '../core/settings/user_preferences.dart';
 import '../core/settings/app_settings.dart';
 import '../workers/background_scheduler_worker.dart';
+
 
 class SettingsScreen extends StatefulWidget {
 	const SettingsScreen({super.key});
@@ -12,7 +13,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class SettingsScreenState extends State<SettingsScreen> {
-	final UserPreferencesStorage _storage = UserPreferencesStorage();
+	final UserPreferences _storage = UserPreferences();
 	late AppSettings _settings;
 	bool _isLoading = true;
 
@@ -120,6 +121,10 @@ class SettingsScreenState extends State<SettingsScreen> {
 
 						_buildSectionHeader('// ACTIVE DAYS OF WEEK'),
 						_buildDaysOfWeekSelector(),
+						const SizedBox(height: 20),
+
+						_buildSectionHeader('// MINIMUN BATCH SYNC SIZE'),
+						_buildBatchSizeSelector(),
 						const SizedBox(height: 20),
 
 						_buildSectionHeader('// NETWORK CONSTRAINTS'),
@@ -401,6 +406,38 @@ class SettingsScreenState extends State<SettingsScreen> {
 					value: _settings.speedTestOnlyOnWifi,
 					activeThumbColor: const Color(0xFF58A6FF),
 					onChanged: (val) => _updateSettings(_settings.copyWith(speedTestOnlyOnWifi: val)),
+				),
+			),
+		);
+	}
+
+	Widget _buildBatchSizeSelector() {
+		final sizes = [5, 10, 15, 20];
+
+		return Container(
+			padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+			decoration: BoxDecoration(
+				color: const Color(0xFF161B22),
+				borderRadius: BorderRadius.circular(6),
+				border: Border.all(color: const Color(0xFF30363D)),
+			),
+			child: DropdownButtonHideUnderline(
+				child: DropdownButton<int>(
+					value: sizes.contains(_settings.minBatchSize) ? _settings.minBatchSize : 5,
+					dropdownColor: const Color(0xFF161B22),
+					isExpanded: true,
+					style: const TextStyle(fontFamily: 'monospace', color: Colors.white, fontSize: 13),
+					items: sizes.map((int size) {
+						return DropdownMenuItem<int>(
+							value: size,
+							child: Text('Sync batch size: $size records'),
+						);
+					}).toList(),
+					onChanged: (val) {
+						if (val != null) {
+							_updateSettings(_settings.copyWith(minBatchSize: val));
+						}
+					},
 				),
 			),
 		);

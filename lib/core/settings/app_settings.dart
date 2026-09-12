@@ -9,6 +9,7 @@ class AppSettings {
 	final TimeOfDay endTime;
 	final Set<int> activeDays; // 1 = Monday, 7 = Sunday
 	final bool speedTestOnlyOnWifi;
+	final int minBatchSize;
 
 	const AppSettings({
 		required this.isBackgroundServiceEnabled,
@@ -18,6 +19,7 @@ class AppSettings {
 		required this.endTime,
 		required this.activeDays,
 		this.speedTestOnlyOnWifi = false,
+		this.minBatchSize = 5,
 	});
 
 	factory AppSettings.defaultSettings() {
@@ -29,6 +31,7 @@ class AppSettings {
 			endTime: TimeOfDay(hour: 18, minute: 0),
 			activeDays: {1, 2, 3, 4, 5},
 			speedTestOnlyOnWifi: false,
+			minBatchSize: 5,
 		);
 	}
 
@@ -43,6 +46,7 @@ class AppSettings {
 			'endTimeMinute': endTime.minute,
 			'activeDays': activeDays.toList(),
 			'speedTestOnlyOnWifi': speedTestOnlyOnWifi,
+			'minBatchSize': minBatchSize,
 		};
 	}
 
@@ -63,6 +67,7 @@ class AppSettings {
 					?.map((e) => e as int)
 					.toSet() ?? {1, 2, 3, 4, 5},
 			speedTestOnlyOnWifi: map['speedTestOnlyOnWifi'] as bool? ?? false,
+			minBatchSize: map['minBatchSize'] as int? ?? 5,
 		);
 	}
 
@@ -74,6 +79,7 @@ class AppSettings {
 		TimeOfDay? endTime,
 		Set<int>? activeDays,
 		bool? speedTestOnlyOnWifi,
+		int? minBatchSize,
 	}) {
 		return AppSettings(
 			isBackgroundServiceEnabled: isBackgroundServiceEnabled ?? this.isBackgroundServiceEnabled,
@@ -83,6 +89,7 @@ class AppSettings {
 			endTime: endTime ?? this.endTime,
 			activeDays: activeDays ?? this.activeDays,
 			speedTestOnlyOnWifi: speedTestOnlyOnWifi ?? this.speedTestOnlyOnWifi,
+			minBatchSize: minBatchSize ?? this.minBatchSize,
 		);
 	}
 }
