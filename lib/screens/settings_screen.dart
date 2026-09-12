@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../core/settings/user_preferences_storage.dart';
+import '../core/settings/user_preferences.dart';
 import '../core/settings/app_settings.dart';
 import '../workers/background_scheduler_worker.dart';
+
 
 class SettingsScreen extends StatefulWidget {
 	const SettingsScreen({super.key});
@@ -12,7 +13,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class SettingsScreenState extends State<SettingsScreen> {
-	final UserPreferencesStorage _storage = UserPreferencesStorage();
+	final UserPreferences _storage = UserPreferences();
 	late AppSettings _settings;
 	bool _isLoading = true;
 

@@ -5,7 +5,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../core/settings/app_settings.dart';
-import '../core/settings/user_preferences_storage.dart';
+import '../core/settings/user_preferences.dart';
 import '../data/local_measurement_storage.dart';
 import '../services/internet_quality_service.dart';
 import '../services/location_service.dart';
@@ -20,7 +20,7 @@ void onStart(ServiceInstance service) async {
 	DartPluginRegistrant.ensureInitialized();
 	WidgetsFlutterBinding.ensureInitialized();
 
-	final preferencesStorage = UserPreferencesStorage();
+	final preferences = UserPreferences();
 	final localStorage = LocalMeasurementStorage();
 
 	final measurementService = MeasurementService(
@@ -40,38 +40,38 @@ void onStart(ServiceInstance service) async {
 
 	service.on('updateSettings').listen((event) async {
 		timer?.cancel();
-		timer = await _scheduleNextRun(service, preferencesStorage, localStorage, measurementService);
+		timer = await _scheduleNextRun(service, preferences, localStorage, measurementService);
 	});
 
 	// Executes an initial measurement cycle when starting the service
-	await _runMeasurementCycle(service, preferencesStorage, localStorage, measurementService);
+	await _runMeasurementCycle(service, preferences, localStorage, measurementService);
 
-	timer = await _scheduleNextRun(service, preferencesStorage, localStorage, measurementService);
+	timer = await _scheduleNextRun(service, preferences, localStorage, measurementService);
 }
 
 Future<Timer> _scheduleNextRun(
 	ServiceInstance service,
-	UserPreferencesStorage preferencesStorage,
+	UserPreferences preferences,
 	LocalMeasurementStorage localStorage,
 	MeasurementService measurementService,
 ) async {
-	final settings = await preferencesStorage.getSettings();
+	final settings = await preferences.getSettings();
 	final interval = Duration(
 		minutes: settings.intervalInMinutes > 0 ? settings.intervalInMinutes : 15,
 	);
 
 	return Timer.periodic(interval, (timer) async {
-		await _runMeasurementCycle(service, preferencesStorage, localStorage, measurementService);
+		await _runMeasurementCycle(service, preferences, localStorage, measurementService);
 	});
 }
 
 Future<void> _runMeasurementCycle(
 	ServiceInstance service,
-	UserPreferencesStorage preferencesStorage,
+	UserPreferences preferences,
 	LocalMeasurementStorage localStorage,
 	MeasurementService measurementService,
 ) async {
-	final currentSettings = await preferencesStorage.getSettings();
+	final currentSettings = await preferences.getSettings();
 
 	if (!currentSettings.isBackgroundServiceEnabled) {
 		service.stopSelf();
