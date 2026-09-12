@@ -123,6 +123,10 @@ class SettingsScreenState extends State<SettingsScreen> {
 						_buildDaysOfWeekSelector(),
 						const SizedBox(height: 20),
 
+						_buildSectionHeader('// MINIMUN BATCH SYNC SIZE'),
+						_buildBatchSizeSelector(),
+						const SizedBox(height: 20),
+
 						_buildSectionHeader('// NETWORK CONSTRAINTS'),
 						_buildNetworkOptions(),
 					],
@@ -402,6 +406,38 @@ class SettingsScreenState extends State<SettingsScreen> {
 					value: _settings.speedTestOnlyOnWifi,
 					activeThumbColor: const Color(0xFF58A6FF),
 					onChanged: (val) => _updateSettings(_settings.copyWith(speedTestOnlyOnWifi: val)),
+				),
+			),
+		);
+	}
+
+	Widget _buildBatchSizeSelector() {
+		final sizes = [5, 10, 15, 20];
+
+		return Container(
+			padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+			decoration: BoxDecoration(
+				color: const Color(0xFF161B22),
+				borderRadius: BorderRadius.circular(6),
+				border: Border.all(color: const Color(0xFF30363D)),
+			),
+			child: DropdownButtonHideUnderline(
+				child: DropdownButton<int>(
+					value: sizes.contains(_settings.minBatchSize) ? _settings.minBatchSize : 5,
+					dropdownColor: const Color(0xFF161B22),
+					isExpanded: true,
+					style: const TextStyle(fontFamily: 'monospace', color: Colors.white, fontSize: 13),
+					items: sizes.map((int size) {
+						return DropdownMenuItem<int>(
+							value: size,
+							child: Text('Sync batch size: $size records'),
+						);
+					}).toList(),
+					onChanged: (val) {
+						if (val != null) {
+							_updateSettings(_settings.copyWith(minBatchSize: val));
+						}
+					},
 				),
 			),
 		);
