@@ -30,7 +30,7 @@ class MeasurementService {
 
 		final measurement = Measurement(
 			id: DateTime.now().microsecondsSinceEpoch.toString(),
-			timestamp: DateTime.now(),
+			timestamp: DateTime.now().toUtc(),
 
 			location: location,
 			noiseMeasurement: noiseMeasurement,
