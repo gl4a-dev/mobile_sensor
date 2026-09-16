@@ -58,14 +58,8 @@ class AuthService {
 
 			return await _auth.signInWithCredential(credential);
 
-		} catch (e, stackTrace) {
+		} catch (e) {
 			await signOut();
-
-			print('--- ERROR DETAIS ---');
-			print(e);
-			print(stackTrace);
-			print('---------------------------------------');
-
 			if (e.toString().contains('Exception:')) rethrow;
 			return null;
 		}

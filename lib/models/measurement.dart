@@ -30,7 +30,7 @@ class Measurement {
 	Map<String, dynamic> toMap() {
 		return {
 			'id': id,
-			'timestamp': timestamp.toIso8601String(),
+			'timestamp': timestamp.toUtc().toIso8601String(),
 			'location': location?.toMap(),
 			'internet_quality': internetQuality?.toMap(),
 			'network_status': networkStatus?.toMap(),
